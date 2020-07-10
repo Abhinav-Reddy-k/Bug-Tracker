@@ -1,63 +1,31 @@
-// Action Types
-const BUG_ADDED = "bugAdded";
-const BUG_REMOVED = "bugRemoved";
-const BUG_RESOLVED = "bugResolved";
-const BUG_DIFFICULTY = "bugDifficulty";
+import { createAction, createReducer } from "@reduxjs/toolkit";
 
 // Actions
-export const bugAdded = (discription) => ({
-  type: BUG_ADDED,
-  payload: {
-    discription,
-  },
-});
 
-export const bugRemoved = (id) => ({
-  type: BUG_REMOVED,
-  payload: {
-    id,
-  },
-});
+export const bugAdded = createAction("bugAdded");
 
-export const bugResolved = (id) => ({
-  type: BUG_RESOLVED,
-  payload: {
-    id,
-  },
-});
+export const bugRemoved = createAction("bugRemoved");
 
-export const bugDifficulty = (id, difficulty) => ({
-  type: BUG_DIFFICULTY,
-  payload: {
-    id,
-    difficulty,
-  },
-});
+export const bugResolved = createAction("bugResolved");
 
 // Reducers
 let lastId = 0;
 
-export default function reducer(state = [], action) {
-  if (action.type === BUG_ADDED)
-    return [
-      ...state,
-      {
-        id: ++lastId,
-        discription: action.payload.discription,
-        resolved: false,
-      },
-    ];
-  else if (action.type === BUG_REMOVED)
-    return state.filter((bug) => bug.id !== action.payload.id);
-  else if (action.type === BUG_RESOLVED)
-    return state.map((bug) =>
-      bug.id !== action.payload.id ? bug : { ...bug, resolved: true }
-    );
-  else if (action.type === BUG_DIFFICULTY)
-    return state.map((bug) =>
-      bug.id === action.payload.id
-        ? { ...bug, difficulty: action.payload.difficulty }
-        : bug
-    );
-  else return state;
-}
+export default createReducer([], {
+  [bugAdded.type]: (bugs, action) => {
+    bugs.push({
+      id: ++lastId,
+      discription: action.payload.discription,
+      resolved: false,
+    });
+  },
+
+  [bugRemoved.type]: (bugs, action) => {
+    bugs.filter((bug) => bug.id !== action.payload.id);
+  },
+
+  [bugResolved.type]: (bugs, action) => {
+    const index = bugs.findIndex((bug) => bug.id === action.payload.id);
+    bugs[index].resolved = true;
+  },
+});

@@ -1,14 +1,13 @@
-import { bugAdded, bugRemoved, bugResolved, bugDifficulty } from "./store/bugs";
-import configureStore from "./store/configureStore";
+import { bugAdded, bugRemoved, bugResolved } from "./store/bugs";
+import getStore from "./store/configureStore";
 
-const store = configureStore();
+const store = getStore();
 
 const unsubscribe = store.subscribe(() => {
   console.log("Store Changed ", store.getState());
 });
 
-store.dispatch(bugAdded("bug 1 redux"));
-store.dispatch(bugAdded("bug 2"));
-store.dispatch(bugRemoved(1));
-store.dispatch(bugResolved(2));
-store.dispatch(bugDifficulty(2, "very Difficult"));
+store.dispatch(bugAdded({ description: "Bug1" }));
+store.dispatch(bugAdded({ description: "Bug2" }));
+store.dispatch(bugRemoved({ id: 1 }));
+store.dispatch(bugResolved({ id: 2 }));
