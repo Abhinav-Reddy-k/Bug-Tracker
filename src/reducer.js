@@ -1,4 +1,9 @@
-import { BUG_ADDED, BUG_REMOVED, BUG_RESOLVED } from "./actionsTypes";
+import {
+  BUG_ADDED,
+  BUG_REMOVED,
+  BUG_RESOLVED,
+  BUG_DIFFICULTY,
+} from "./actionsTypes";
 
 let lastId = 0;
 
@@ -17,6 +22,12 @@ export function reducer(state = [], action) {
   else if (action.type === BUG_RESOLVED)
     return state.map((bug) =>
       bug.id !== action.payload.id ? bug : { ...bug, resolved: true }
+    );
+  else if (action.type === BUG_DIFFICULTY)
+    return state.map((bug) =>
+      bug.id === action.payload.id
+        ? { ...bug, difficulty: action.payload.difficulty }
+        : bug
     );
   else return state;
 }
