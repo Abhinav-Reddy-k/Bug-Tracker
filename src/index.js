@@ -1,5 +1,6 @@
 import { bugAdded, bugRemoved, bugResolved } from "./store/bugs";
 import getStore from "./store/configureStore";
+import { projectAdded } from "./store/projects";
 
 const store = getStore();
 
@@ -11,3 +12,5 @@ store.dispatch(bugAdded({ description: "Bug1" }));
 store.dispatch(bugAdded({ description: "Bug2" }));
 store.dispatch(bugRemoved({ id: 1 }));
 store.dispatch(bugResolved({ id: 2 }));
+
+store.dispatch(projectAdded({ name: "Abhinav redux project" }));
