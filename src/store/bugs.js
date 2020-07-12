@@ -1,6 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { createSelector } from "reselect";
 import { apiCallBegan } from "./api";
+import moment from "moment";
 
 let lastId = 0;
 
@@ -24,14 +25,11 @@ const slice = createSlice({
     bugsReceived: (bugs, action) => {
       bugs.list = action.payload;
       bugs.loading = false;
+      bugs.lastFetch = Date.now();
     },
 
     bugAdded: (bugs, action) => {
-      bugs.list.push({
-        id: ++lastId,
-        description: action.payload.description,
-        resolved: false,
-      });
+      bugs.list.push(action.payload);
     },
 
     bugRemoved: (bugs, action) => {
@@ -66,12 +64,42 @@ export default slice.reducer;
 // action Creator
 const bugsEndpoint = "/bugs";
 
-export const loadBugs = () =>
+export const loadBugs = () => (dispatch, getState) => {
+  const { lastFetch } = getState().entities.bugs; // Implimented Cache
+  const diffInMinutes = moment().diff(moment(lastFetch), "minutes");
+  if (diffInMinutes < 1) return;
+  dispatch(
+    apiCallBegan({
+      url: bugsEndpoint,
+      onSuccess: bugsReceived.type,
+      onLoading: bugsLoaded.type,
+      onError: bugsLoadingFailed.type,
+    })
+  );
+};
+
+export const addBugs = (bug) =>
   apiCallBegan({
     url: bugsEndpoint,
-    onSuccess: bugsReceived.type,
-    onLoading: bugsLoaded.type,
-    onError: bugsLoadingFailed.type,
+    method: "POST",
+    data: bug,
+    onSuccess: bugAdded.type,
+  });
+
+export const assignBugToUser = (bug) =>
+  apiCallBegan({
+    url: bugsEndpoint,
+    method: "patch",
+    data: bug,
+    onSuccess: bugAssignedToUser.type,
+  });
+
+export const resoleBug = (id) =>
+  apiCallBegan({
+    url: `${bugsEndpoint}/${id}`,
+    method: "patch",
+    data: { resolved: true },
+    onSuccess: bugResolved.type,
   });
 
 // Selectors

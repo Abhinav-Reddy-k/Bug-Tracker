@@ -9,16 +9,16 @@ const api = (store) => (next) => async (action) => {
 
   try {
     const responce = await axios.request({
-      baseURL: "http://localhost:900/api",
+      baseURL: "http://localhost:9001/api",
       url,
       method,
       data,
     });
 
-    //general
-    store.dispatch(apiCallSuccess(responce.data));
     // specific
     if (onSuccess) store.dispatch({ type: onSuccess, payload: responce.data });
+    //general
+    else store.dispatch(apiCallSuccess(responce.data));
   } catch (error) {
     // for general errors
     store.dispatch(apiCallFailed(error.message));
