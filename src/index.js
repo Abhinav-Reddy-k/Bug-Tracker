@@ -9,12 +9,9 @@ import {
 import getStore from "./store/configureStore";
 import { projectAdded } from "./store/projects";
 import { userAdded } from "./store/users";
+import { apiCallBegan } from "./store/api";
 
 const store = getStore();
-
-const unsubscribe = store.subscribe(() => {
-  console.log("Store Changed ", store.getState());
-});
 
 store.dispatch(bugAdded({ description: "Bug1" }));
 store.dispatch(bugAdded({ description: "Bug2" }));
@@ -28,3 +25,10 @@ store.dispatch(userAdded({ name: "Neha" }));
 
 console.log(getUnresolvedBugs(store.getState()));
 console.log(getBugsByUser(1)(store.getState()));
+
+store.dispatch(
+  apiCallBegan({
+    url: "/bugs",
+    onSuccess: "bugsReceived",
+  })
+);
