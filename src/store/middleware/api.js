@@ -4,23 +4,26 @@ import { apiCallBegan, apiCallFailed, apiCallSuccess } from "./../api";
 const api = (store) => (next) => async (action) => {
   if (action.type !== apiCallBegan.type) return next(action);
   next(action);
-  const { url, onSuccess, onError, method, data } = action.payload;
+  const { url, onSuccess, onError, method, data, onLoading } = action.payload;
+  if (onLoading) store.dispatch({ type: onLoading });
+
   try {
     const responce = await axios.request({
-      baseURL: "http://localhost:9001/api",
+      baseURL: "http://localhost:900/api",
       url,
       method,
       data,
     });
+
     //general
     store.dispatch(apiCallSuccess(responce.data));
     // specific
     if (onSuccess) store.dispatch({ type: onSuccess, payload: responce.data });
   } catch (error) {
     // for general errors
-    store.dispatch(apiCallFailed(error));
+    store.dispatch(apiCallFailed(error.message));
     // for specific errors
-    if (onError) store.dispatch({ type: onError, payload: error });
+    if (onError) store.dispatch({ type: onError, payload: error.message });
   }
 };
 
