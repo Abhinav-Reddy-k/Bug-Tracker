@@ -8,6 +8,7 @@ import {
   loadBugs,
   addBugs,
   resoleBug,
+  assignBugToUser,
 } from "./store/bugs";
 import getStore from "./store/configureStore";
 import { projectAdded } from "./store/projects";
@@ -16,4 +17,4 @@ import { userAdded } from "./store/users";
 const store = getStore();
 
 store.dispatch(loadBugs());
-setTimeout(() => store.dispatch(resoleBug(3)), 1000);
+setTimeout(() => store.dispatch(assignBugToUser(2, 10)), 1000);

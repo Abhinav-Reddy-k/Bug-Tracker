@@ -3,8 +3,6 @@ import { createSelector } from "reselect";
 import { apiCallBegan } from "./api";
 import moment from "moment";
 
-let lastId = 0;
-
 const slice = createSlice({
   name: "bugs",
   initialState: {
@@ -38,18 +36,19 @@ const slice = createSlice({
     },
 
     bugResolved: (bugs, action) => {
-      const index = bugs.list.findIndex((bug) => bug.id === action.payload.id);
-      bugs.list[index].resolved = true;
+      const { id, resolved } = action.payload;
+      const index = bugs.list.findIndex((bug) => bug.id === id);
+      bugs.list[index].resolved = resolved;
     },
 
     bugAssignedToUser: (bugs, action) => {
-      const { bugId, userId } = action.payload;
+      const { id: bugId, userId } = action.payload;
       bugs.list.map((bug) => (bug.id === bugId ? (bug.userId = userId) : bug));
     },
   },
 });
 
-export const {
+const {
   bugAdded,
   bugRemoved,
   bugResolved,
@@ -65,7 +64,7 @@ export default slice.reducer;
 const bugsEndpoint = "/bugs";
 
 export const loadBugs = () => (dispatch, getState) => {
-  const { lastFetch } = getState().entities.bugs; // Implimented Cache
+  const { lastFetch } = getState().entities.bugs; // Implimented Cache && using "thunk"
   const diffInMinutes = moment().diff(moment(lastFetch), "minutes");
   if (diffInMinutes < 1) return;
   dispatch(
@@ -86,11 +85,11 @@ export const addBugs = (bug) =>
     onSuccess: bugAdded.type,
   });
 
-export const assignBugToUser = (bug) =>
+export const assignBugToUser = (bugId, userId) =>
   apiCallBegan({
-    url: bugsEndpoint,
+    url: `${bugsEndpoint}/${bugId}`,
     method: "patch",
-    data: bug,
+    data: { userId },
     onSuccess: bugAssignedToUser.type,
   });
 
